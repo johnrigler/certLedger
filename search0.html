@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>USPS Certified Mail Evidence Index</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f2ec;
+      --card: #ffffff;
+      --ink: #1d1d1f;
+      --muted: #5f6368;
+      --line: #d8d2c8;
+      --accent: #314f7a;
+      --accent2: #7a3f31;
+      --code: #ebe6dc;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151515;
+        --card: #202020;
+        --ink: #eeeeee;
+        --muted: #aaaaaa;
+        --line: #3b3b3b;
+        --accent: #9ab8ef;
+        --accent2: #e0a08e;
+        --code: #2b2b2b;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+    header, main { max-width: 1180px; margin: 0 auto; padding: 18px; }
+    header { padding-top: 28px; }
+    h1 { margin: 0 0 6px; font-size: clamp(1.8rem, 4vw, 3.1rem); letter-spacing: -0.04em; }
+    h2 { margin: 28px 0 10px; font-size: 1.25rem; }
+    h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    p { margin: 0 0 12px; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr)); gap: 14px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: .82rem;
+      color: var(--muted);
+      background: transparent;
+    }
+    code, .tracking-number {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: var(--code);
+      border-radius: 6px;
+      padding: 2px 5px;
+      word-break: break-all;
+    }
+    a.button, button {
+      display: inline-block;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      color: var(--accent);
+      background: transparent;
+      padding: 7px 10px;
+      font-weight: 650;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+    }
+    a.button:hover, button:hover { filter: brightness(0.9); }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      resize: vertical;
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    iframe {
+      width: 100%;
+      min-height: 360px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+    }
+    .warning { border-left: 4px solid var(--accent2); }
+    .small { font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>USPS Certified Mail Evidence Index</h1>
+    <p class="muted">Local index for USPS Certified Mail / Return Receipt tracking numbers, live USPS lookup links, and saved screenshot evidence.</p>
+  </header>
+
+  <main>
+    <section class="card warning">
+      <h2>Evidence note</h2>
+      <p>This file is meant to preserve your local record. USPS tracking pages are live external pages and may change. The PNG screenshots below are the durable local copies.</p>
+      <p class="small muted">Possible browser issue: USPS may block iframe embedding. The direct links and “Open all USPS tabs” button are more reliable than embedded frames.</p>
+    </section>
+
+    <section>
+      <h2>Tracking records</h2>
+      <div id="records" class="grid"></div>
+    </section>
+
+    <section>
+      <h2>Bulk USPS query links</h2>
+      <div class="card">
+        <p>These are generated from the index array in this page.</p>
+        <p class="row">
+          <a id="bulkLink" class="button" target="_blank" rel="noopener">Open combined USPS query</a>
+          <button id="openAll" type="button">Open all USPS tabs</button>
+          <button id="copyNumbers" type="button">Copy tracking numbers</button>
+        </p>
+        <textarea id="numberDump" readonly></textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2>Saved local screenshots</h2>
+      <div id="screenshots" class="grid"></div>
+    </section>
+
+    <section>
+      <h2>Optional live embeds</h2>
+      <div class="card">
+        <p class="muted">These frames query USPS directly. They are convenience views, not evidence. If blank, use the external buttons above.</p>
+      </div>
+      <div id="iframes" class="grid"></div>
+    </section>
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  const USPS_TRACK_BASE = "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=";
+
+  // Source index. Keep this as the one place to update tracking numbers.
+  const trackingRecords = [
+    {
+      label: "Office",
+      party: "Apartment office",
+      type: "USPS Certified Mail",
+      tracking: "9589071052702997537269",
+      destination: "Austin, TX 78752",
+      screenshots: []
+    },
+    {
+      label: "Firmus",
+      party: "Firmus",
+      type: "USPS Certified Mail",
+      tracking: "9589071052702997537276",
+      destination: "Austin, TX 78755",
+      screenshots: [
+        {
+          file: "9589071052702997537276-chimneyCorners.png",
+          caption: "Firmus certified mail screenshot showing CHIMNEY CORNERS / Austin handling location."
+        }
+      ]
+    },
+    {
+      label: "Firmus return receipt",
+      party: "Firmus",
+      type: "USPS Return Receipt",
+      tracking: "9590940307435196413103",
+      destination: "Austin, TX 78755",
+      screenshots: []
+    },
+    {
+      label: "Office return receipt",
+      party: "Apartment office",
+      type: "USPS Return Receipt",
+      tracking: "9590940307435196413110",
+      destination: "Austin, TX 78752",
+      screenshots: []
+    },
+    {
+      label: "NCS",
+      party: "National Credit Systems",
+      type: "USPS Certified Mail",
+      tracking: "9589071052702997537290",
+      destination: "Marietta, GA 30006",
+      screenshots: [
+        {
+          file: "9589071052702997537290-pastAtlanta.png",
+          caption: "NCS certified mail screenshot from earlier Atlanta-area tracking state."
+        },
+        {
+          file: "9589071052702997537290-marietta.png",
+          caption: "NCS certified mail screenshot showing Marietta, GA PO Box availability/delivery state."
+        }
+      ]
+    }
+  ];
+
+  function uspsUrl(tracking) {
+    return USPS_TRACK_BASE + encodeURIComponent(tracking);
+  }
+
+  function el(tag, attrs, text) {
+    const node = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (key) {
+      if (key === "className") node.className = attrs[key];
+      else if (key === "html") node.innerHTML = attrs[key];
+      else node.setAttribute(key, attrs[key]);
+    });
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function renderRecords() {
+    const holder = document.getElementById("records");
+    trackingRecords.forEach(function (record) {
+      const card = el("article", { className: "card" });
+      card.appendChild(el("h3", {}, record.label));
+      card.appendChild(el("p", { className: "tracking-number" }, record.tracking));
+      const meta = el("p", { className: "row" });
+      meta.appendChild(el("span", { className: "pill" }, record.type));
+      meta.appendChild(el("span", { className: "pill" }, record.destination));
+      meta.appendChild(el("span", { className: "pill" }, record.party));
+      card.appendChild(meta);
+      const linkRow = el("p", { className: "row" });
+      linkRow.appendChild(el("a", { className: "button", href: uspsUrl(record.tracking), target: "_blank", rel: "noopener" }, "USPS lookup"));
+      const copy = el("button", { type: "button" }, "Copy number");
+      copy.addEventListener("click", function () { navigator.clipboard.writeText(record.tracking); });
+      linkRow.appendChild(copy);
+      card.appendChild(linkRow);
+      holder.appendChild(card);
+    });
+  }
+
+  function renderBulk() {
+    const numbers = trackingRecords.map(function (r) { return r.tracking; });
+    const dump = numbers.join("\n");
+    document.getElementById("numberDump").value = dump;
+
+    // USPS accepts a single qtc_tLabels1 field. Multiple-label behavior can change, so this is best-effort.
+    document.getElementById("bulkLink").href = USPS_TRACK_BASE + encodeURIComponent(numbers.join(","));
+
+    document.getElementById("openAll").addEventListener("click", function () {
+      trackingRecords.forEach(function (r) { window.open(uspsUrl(r.tracking), "_blank", "noopener"); });
+    });
+    document.getElementById("copyNumbers").addEventListener("click", function () {
+      navigator.clipboard.writeText(dump);
+    });
+  }
+
+  function renderScreenshots() {
+    const holder = document.getElementById("screenshots");
+    trackingRecords.forEach(function (record) {
+      record.screenshots.forEach(function (shot) {
+        const card = el("figure", { className: "card" });
+        card.appendChild(el("h3", {}, record.label + " screenshot"));
+        card.appendChild(el("p", { className: "tracking-number" }, record.tracking));
+        card.appendChild(el("img", { src: shot.file, alt: shot.caption, loading: "lazy" }));
+        card.appendChild(el("figcaption", { className: "small muted" }, shot.caption + " File: " + shot.file));
+        holder.appendChild(card);
+      });
+    });
+  }
+
+  function renderIframes() {
+    const holder = document.getElementById("iframes");
+    trackingRecords.forEach(function (record) {
+      const card = el("article", { className: "card" });
+      card.appendChild(el("h3", {}, record.label));
+      card.appendChild(el("iframe", { src: uspsUrl(record.tracking), title: "USPS tracking for " + record.tracking, loading: "lazy" }));
+      card.appendChild(el("p", { className: "small muted" }, "Tracking: " + record.tracking));
+      holder.appendChild(card);
+    });
+  }
+
+  renderRecords();
+  renderBulk();
+  renderScreenshots();
+  renderIframes();
+}());
+</script>
+</body>
+</html>

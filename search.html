@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Broken Lease Evidence + Letter Crafting Index</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f2ec;
+      --card: #ffffff;
+      --ink: #1d1d1f;
+      --muted: #5f6368;
+      --line: #d8d2c8;
+      --accent: #314f7a;
+      --accent2: #7a3f31;
+      --code: #ebe6dc;
+      --ok: #276749;
+      --warn: #8a4b08;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151515;
+        --card: #202020;
+        --ink: #eeeeee;
+        --muted: #aaaaaa;
+        --line: #3b3b3b;
+        --accent: #9ab8ef;
+        --accent2: #e0a08e;
+        --code: #2b2b2b;
+        --ok: #8fd4aa;
+        --warn: #e7b56b;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+    header, main { max-width: 1180px; margin: 0 auto; padding: 18px; }
+    header { padding-top: 28px; }
+    h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 3rem); letter-spacing: -0.04em; }
+    h2 { margin: 28px 0 10px; font-size: 1.25rem; }
+    h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    p { margin: 0 0 12px; }
+    ul { margin-top: 8px; padding-left: 22px; }
+    li { margin: 5px 0; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(285px, 1fr)); gap: 14px; }
+    .wide-grid { display: grid; grid-template-columns: minmax(285px, .85fr) minmax(320px, 1.15fr); gap: 14px; align-items: start; }
+    @media (max-width: 850px) { .wide-grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: .82rem;
+      color: var(--muted);
+      background: transparent;
+    }
+    .pill.ok { color: var(--ok); border-color: currentColor; }
+    .pill.warn { color: var(--warn); border-color: currentColor; }
+    code, .tracking-number {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: var(--code);
+      border-radius: 6px;
+      padding: 2px 5px;
+      word-break: break-all;
+    }
+    a.button, button {
+      display: inline-block;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      color: var(--accent);
+      background: transparent;
+      padding: 7px 10px;
+      font-weight: 650;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+    }
+    a.button:hover, button:hover { filter: brightness(0.9); }
+    textarea, input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font: inherit;
+    }
+    textarea {
+      min-height: 130px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      resize: vertical;
+    }
+    label { display: block; font-weight: 650; margin: 10px 0 5px; }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .warning { border-left: 4px solid var(--accent2); }
+    .small { font-size: .9rem; }
+    .letter-list { display: grid; gap: 8px; }
+    .letter-item { border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+    .divider { height: 1px; background: var(--line); margin: 14px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Broken Lease Evidence + Letter Crafting Index</h1>
+    <p class="muted">Static local index for USPS evidence, local screenshots, and demand/dispute letter drafting around broken lease rent acceleration in Texas.</p>
+  </header>
+
+  <main>
+    <section class="card warning">
+      <h2>Use model</h2>
+      <p>This is an evidence and drafting helper. It does not decide the law. Keep legal claims conservative: identify disputed charges, demand validation/accounting, preserve proof of mailing, and avoid unsupported admissions.</p>
+      <p class="small muted">Local file assumption: keep this HTML, the PNG screenshots, and the letter files in the same directory unless you change the paths in the index arrays below.</p>
+    </section>
+
+    <section>
+      <h2>Tracking records</h2>
+      <div id="records" class="grid"></div>
+    </section>
+
+    <section>
+      <h2>Letters by recipient</h2>
+      <div id="recipientLetters" class="grid"></div>
+    </section>
+
+    <section class="wide-grid">
+      <div class="card">
+        <h2>Letter craft controls</h2>
+        <label for="recipientSelect">Recipient</label>
+        <select id="recipientSelect"></select>
+
+        <label for="letterSelect">Base letter file</label>
+        <select id="letterSelect"></select>
+
+        <label for="claimTheme">Legal theme</label>
+        <input id="claimTheme" value="Broken lease rent acceleration in Texas">
+
+        <label for="factsBox">Facts to preserve</label>
+        <textarea id="factsBox">Apartment claimed about $10,000 after broken lease.
+Large portion appears to be accelerated rent, roughly $8,000.
+Additional concession charge-back appears around $1,500.
+Debt has been placed with National Credit Systems.
+Certified letters were sent to apartment office, Firmus, and NCS.
+Request validation, full accounting, lease provisions relied upon, mitigation details, and correction/deletion of inaccurate credit reporting.</textarea>
+
+        <label for="requestsBox">Requested outcomes</label>
+        <textarea id="requestsBox">Validate the debt with itemized accounting.
+Identify whether the amount includes accelerated rent, reletting fees, concessions, damages, utilities, late fees, attorney fees, or other charges.
+Provide the lease clause relied upon for each charge.
+Explain mitigation/reletting efforts and any rent recovered.
+Cease or correct inaccurate credit reporting while disputed.</textarea>
+
+        <p class="row">
+          <button id="buildDraft" type="button">Build drafting notes</button>
+          <button id="copyDraft" type="button">Copy drafting notes</button>
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Drafting notes</h2>
+        <textarea id="draftOutput" readonly></textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2>Bulk USPS query links</h2>
+      <div class="card">
+        <p>These are generated from the tracking index array in this page. Iframes were intentionally removed.</p>
+        <p class="row">
+          <a id="bulkLink" class="button" target="_blank" rel="noopener">Open combined USPS query</a>
+          <button id="openAll" type="button">Open all USPS tabs</button>
+          <button id="copyNumbers" type="button">Copy tracking numbers</button>
+        </p>
+        <textarea id="numberDump" readonly></textarea>
+      </div>
+    </section>
+
+    <section>
+      <h2>Saved local screenshots</h2>
+      <div id="screenshots" class="grid"></div>
+    </section>
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  const USPS_TRACK_BASE = "https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=";
+
+  const letters = [
+    {
+      id: "letter0",
+      file: "letter0.html",
+      title: "letter0.html",
+      description: "Initial dispute/demand letter used for apartment office and Firmus.",
+      appliesTo: ["office", "firmus"]
+    },
+    {
+      id: "letter1",
+      file: "letter1.html",
+      title: "letter1.html",
+      description: "Follow-up or specialized letter for Firmus only.",
+      appliesTo: ["firmus"]
+    }
+  ];
+
+  const trackingRecords = [
+    {
+      id: "office",
+      label: "Office",
+      party: "Apartment office",
+      type: "USPS Certified Mail",
+      tracking: "9589071052702997537269",
+      destination: "Austin, TX 78752",
+      role: "Original apartment/location recipient",
+      screenshots: []
+    },
+    {
+      id: "firmus",
+      label: "Firmus",
+      party: "Firmus",
+      type: "USPS Certified Mail",
+      tracking: "9589071052702997537276",
+      destination: "Austin, TX 78755",
+      role: "Property/owner/management recipient",
+      screenshots: [
+        {
+          file: "9589071052702997537276-chimneyCorners.png",
+          caption: "Firmus certified mail screenshot showing CHIMNEY CORNERS / Austin handling location."
+        }
+      ]
+    },
+    {
+      id: "firmusReturn",
+      label: "Firmus return receipt",
+      party: "Firmus",
+      type: "USPS Return Receipt",
+      tracking: "9590940307435196413103",
+      destination: "Austin, TX 78755",
+      role: "Return receipt evidence for Firmus mailing",
+      screenshots: []
+    },
+    {
+      id: "officeReturn",
+      label: "Office return receipt",
+      party: "Apartment office",
+      type: "USPS Return Receipt",
+      tracking: "9590940307435196413110",
+      destination: "Austin, TX 78752",
+      role: "Return receipt evidence for apartment office mailing",
+      screenshots: []
+    },
+    {
+      id: "ncs",
+      label: "NCS",
+      party: "National Credit Systems",
+      type: "USPS Certified Mail",
+      tracking: "9589071052702997537290",
+      destination: "Marietta, GA 30006",
+      role: "Debt collector / credit reporting dispute recipient",
+      screenshots: [
+        {
+          file: "9589071052702997537290-pastAtlanta.png",
+          caption: "NCS certified mail screenshot from earlier Atlanta-area tracking state."
+        },
+        {
+          file: "9589071052702997537290-marietta.png",
+          caption: "NCS certified mail screenshot showing Marietta, GA PO Box availability/delivery state."
+        }
+      ]
+    }
+  ];
+
+  function uspsUrl(tracking) {
+    return USPS_TRACK_BASE + encodeURIComponent(tracking);
+  }
+
+  function el(tag, attrs, text) {
+    const node = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (key) {
+      if (key === "className") node.className = attrs[key];
+      else if (key === "html") node.innerHTML = attrs[key];
+      else node.setAttribute(key, attrs[key]);
+    });
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function lettersForRecord(recordId) {
+    return letters.filter(function (letter) {
+      return letter.appliesTo.indexOf(recordId) !== -1;
+    });
+  }
+
+  function renderRecords() {
+    const holder = document.getElementById("records");
+    trackingRecords.forEach(function (record) {
+      const card = el("article", { className: "card" });
+      card.appendChild(el("h3", {}, record.label));
+      card.appendChild(el("p", { className: "tracking-number" }, record.tracking));
+      const meta = el("p", { className: "row" });
+      meta.appendChild(el("span", { className: "pill" }, record.type));
+      meta.appendChild(el("span", { className: "pill" }, record.destination));
+      meta.appendChild(el("span", { className: "pill" }, record.party));
+      card.appendChild(meta);
+      card.appendChild(el("p", { className: "small muted" }, record.role));
+      const linkRow = el("p", { className: "row" });
+      linkRow.appendChild(el("a", { className: "button", href: uspsUrl(record.tracking), target: "_blank", rel: "noopener" }, "USPS lookup"));
+      const copy = el("button", { type: "button" }, "Copy number");
+      copy.addEventListener("click", function () { navigator.clipboard.writeText(record.tracking); });
+      linkRow.appendChild(copy);
+      card.appendChild(linkRow);
+      holder.appendChild(card);
+    });
+  }
+
+  function renderRecipientLetters() {
+    const holder = document.getElementById("recipientLetters");
+    trackingRecords.filter(function (record) {
+      return ["office", "firmus", "ncs"].indexOf(record.id) !== -1;
+    }).forEach(function (record) {
+      const card = el("article", { className: "card" });
+      const related = lettersForRecord(record.id);
+      card.appendChild(el("h3", {}, record.label));
+      card.appendChild(el("p", { className: "small muted" }, record.party + " · " + record.destination));
+      const list = el("div", { className: "letter-list" });
+      if (!related.length) {
+        list.appendChild(el("p", { className: "muted" }, "No local letter file mapped yet."));
+      }
+      related.forEach(function (letter) {
+        const item = el("div", { className: "letter-item" });
+        item.appendChild(el("p", { className: "row" }));
+        item.lastChild.appendChild(el("span", { className: "pill ok" }, "mapped"));
+        item.lastChild.appendChild(el("code", {}, letter.file));
+        item.appendChild(el("p", { className: "small muted" }, letter.description));
+        const row = el("p", { className: "row" });
+        row.appendChild(el("a", { className: "button", href: letter.file, target: "_blank", rel: "noopener" }, "Open letter"));
+        row.appendChild(el("a", { className: "button", href: letter.file, download: letter.file }, "Download"));
+        item.appendChild(row);
+        list.appendChild(item);
+      });
+      card.appendChild(list);
+      holder.appendChild(card);
+    });
+  }
+
+  function renderBulk() {
+    const numbers = trackingRecords.map(function (r) { return r.tracking; });
+    const dump = numbers.join("\n");
+    document.getElementById("numberDump").value = dump;
+    document.getElementById("bulkLink").href = USPS_TRACK_BASE + encodeURIComponent(numbers.join(","));
+    document.getElementById("openAll").addEventListener("click", function () {
+      trackingRecords.forEach(function (r) { window.open(uspsUrl(r.tracking), "_blank", "noopener"); });
+    });
+    document.getElementById("copyNumbers").addEventListener("click", function () {
+      navigator.clipboard.writeText(dump);
+    });
+  }
+
+  function renderScreenshots() {
+    const holder = document.getElementById("screenshots");
+    trackingRecords.forEach(function (record) {
+      record.screenshots.forEach(function (shot) {
+        const card = el("figure", { className: "card" });
+        card.appendChild(el("h3", {}, record.label + " screenshot"));
+        card.appendChild(el("p", { className: "tracking-number" }, record.tracking));
+        card.appendChild(el("img", { src: shot.file, alt: shot.caption, loading: "lazy" }));
+        card.appendChild(el("figcaption", { className: "small muted" }, shot.caption + " File: " + shot.file));
+        holder.appendChild(card);
+      });
+    });
+  }
+
+  function populateCraftControls() {
+    const recipientSelect = document.getElementById("recipientSelect");
+    const letterSelect = document.getElementById("letterSelect");
+
+    trackingRecords.filter(function (record) {
+      return ["office", "firmus", "ncs"].indexOf(record.id) !== -1;
+    }).forEach(function (record) {
+      recipientSelect.appendChild(el("option", { value: record.id }, record.label + " — " + record.party));
+    });
+
+    function updateLetterSelect() {
+      const recordId = recipientSelect.value;
+      letterSelect.innerHTML = "";
+      const related = lettersForRecord(recordId);
+      if (!related.length) {
+        letterSelect.appendChild(el("option", { value: "" }, "No mapped letter file"));
+        return;
+      }
+      related.forEach(function (letter) {
+        letterSelect.appendChild(el("option", { value: letter.id }, letter.title));
+      });
+    }
+
+    recipientSelect.addEventListener("change", updateLetterSelect);
+    updateLetterSelect();
+  }
+
+  function buildDraftingNotes() {
+    const recipientId = document.getElementById("recipientSelect").value;
+    const letterId = document.getElementById("letterSelect").value;
+    const recipient = trackingRecords.find(function (r) { return r.id === recipientId; });
+    const letter = letters.find(function (l) { return l.id === letterId; });
+    const theme = document.getElementById("claimTheme").value.trim();
+    const facts = document.getElementById("factsBox").value.trim();
+    const requests = document.getElementById("requestsBox").value.trim();
+
+    const lines = [];
+    lines.push("LEGAL / DISPUTE DRAFTING NOTES");
+    lines.push("Theme: " + theme);
+    lines.push("");
+    lines.push("Recipient: " + recipient.label + " / " + recipient.party);
+    lines.push("Destination: " + recipient.destination);
+    lines.push("USPS tracking: " + recipient.tracking);
+    lines.push("USPS lookup: " + uspsUrl(recipient.tracking));
+    lines.push("Base letter file: " + (letter ? letter.file : "none mapped"));
+    lines.push("");
+    lines.push("Core posture:");
+    lines.push("- Treat the amount as disputed, not admitted.");
+    lines.push("- Ask for validation, lease clauses, itemized accounting, mitigation/reletting evidence, and credit reporting correction where applicable.");
+    lines.push("- Avoid saying you owe the amount. Say the claimed amount is disputed and unsupported unless fully validated.");
+    lines.push("");
+    lines.push("Facts to preserve:");
+    lines.push(facts || "[add facts]");
+    lines.push("");
+    lines.push("Requested outcomes:");
+    lines.push(requests || "[add requests]");
+    lines.push("");
+    lines.push("Suggested evidence attachments / exhibits:");
+    lines.push("- USPS Certified Mail receipt / tracking printout for " + recipient.tracking);
+    if (recipient.screenshots.length) {
+      recipient.screenshots.forEach(function (shot) {
+        lines.push("- Local USPS screenshot: " + shot.file);
+      });
+    } else {
+      lines.push("- No local screenshot mapped for this recipient yet.");
+    }
+    if (letter) {
+      lines.push("- Local letter copy: " + letter.file);
+    }
+    lines.push("");
+    lines.push("Open question checklist:");
+    lines.push("- Was rent accelerated beyond the date the unit was or could have been relet?");
+    lines.push("- Was the concession charge-back authorized by a specific lease clause?");
+    lines.push("- Were damages separated from rent, fees, concessions, and collection costs?");
+    lines.push("- Did the collector report the account while the debt was disputed or before validation was supplied?");
+    lines.push("- Is the apartment office, owner/manager, collector, and credit bureau timeline internally consistent?");
+
+    document.getElementById("draftOutput").value = lines.join("\n");
+  }
+
+  document.getElementById("buildDraft").addEventListener("click", buildDraftingNotes);
+  document.getElementById("copyDraft").addEventListener("click", function () {
+    const out = document.getElementById("draftOutput");
+    navigator.clipboard.writeText(out.value);
+  });
+
+  renderRecords();
+  renderRecipientLetters();
+  renderBulk();
+  renderScreenshots();
+  populateCraftControls();
+  buildDraftingNotes();
+}());
+</script>
+</body>
+</html>
