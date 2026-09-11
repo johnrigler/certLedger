@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>certLedger Public-Law Records</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="siteHeader">
+    <div class="shell">
+      <p class="eyebrow">certLedger / accountability</p>
+      <h1>Public-law records</h1>
+      <p class="lede">A source-bounded index of public professional acts, court participation, and case outcomes.</p>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="notice" aria-labelledby="scopeTitle">
+      <h2 id="scopeTitle">Scope</h2>
+      <p>Inclusion records a documented public act. It is not, by itself, an allegation, finding of misconduct, endorsement, or verdict. Allegations, rulings, reversals, dismissals, acquittals, and corrections must be recorded as separate append-only events.</p>
+    </section>
+
+    <section class="integrity panel" aria-labelledby="integrityTitle">
+      <div>
+        <p class="eyebrow">Canonical dataset</p>
+        <h2 id="integrityTitle">Integrity receipt</h2>
+      </div>
+      <dl class="integrityGrid">
+        <div>
+          <dt>Schema</dt>
+          <dd id="schemaVersion">—</dd>
+        </div>
+        <div>
+          <dt>Dataset</dt>
+          <dd id="datasetId">—</dd>
+        </div>
+        <div class="wide">
+          <dt>SHA-256</dt>
+          <dd id="datasetHash" class="hash">Calculating…</dd>
+        </div>
+      </dl>
+      <div class="actions">
+        <button id="downloadButton" type="button">Download canonical JSON</button>
+        <button id="burnButton" class="secondary" type="button">Build Chisel burn plan</button>
+      </div>
+    </section>
+
+    <section id="stats" class="stats" aria-label="Dataset totals"></section>
+
+    <section class="panel" aria-labelledby="recordsTitle">
+      <div class="sectionHeading">
+        <div>
+          <p class="eyebrow">Assertions</p>
+          <h2 id="recordsTitle">Who did what, in which matter</h2>
+        </div>
+        <p id="resultCount" class="resultCount" aria-live="polite"></p>
+      </div>
+
+      <div class="filters">
+        <label>
+          Search
+          <input id="searchInput" type="search" placeholder="Name, relationship, matter, text…">
+        </label>
+        <label>
+          Subject
+          <select id="subjectFilter"><option value="">All subjects</option></select>
+        </label>
+        <label>
+          Matter
+          <select id="matterFilter"><option value="">All matters</option></select>
+        </label>
+        <label>
+          Actor class
+          <select id="actorFilter"><option value="">All actor classes</option></select>
+        </label>
+      </div>
+
+      <div id="records" class="records"></div>
+      <p id="emptyState" class="empty" hidden>No records match these filters.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="sourcesTitle">
+      <div class="sectionHeading">
+        <div>
+          <p class="eyebrow">Provenance</p>
+          <h2 id="sourcesTitle">Source register</h2>
+        </div>
+      </div>
+      <div id="sources" class="sourceList"></div>
+    </section>
+  </main>
+
+  <dialog id="burnDialog">
+    <form method="dialog" class="dialogBody">
+      <div class="sectionHeading">
+        <div>
+          <p class="eyebrow">Pre-broadcast export</p>
+          <h2>Chisel burn plan</h2>
+        </div>
+        <button class="iconButton" value="cancel" aria-label="Close">×</button>
+      </div>
+      <p class="help">These are semantic inputs, not finished addresses. Run each <code>DAx</code>/<code>DCx</code> phrase through the unspendable generator and verify every output before signing. Add the IPFS CID only after pinning the exported canonical JSON.</p>
+      <label>
+        Matter
+        <select id="burnMatter"></select>
+      </label>
+      <textarea id="burnOutput" rows="16" readonly spellcheck="false"></textarea>
+      <div class="actions">
+        <button id="copyBurnButton" type="button">Copy plan</button>
+        <button class="secondary" value="cancel">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <noscript>This tool requires JavaScript to read and filter its bundled dataset.</noscript>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

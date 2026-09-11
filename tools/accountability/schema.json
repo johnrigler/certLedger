@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rigler.org/certledger/schemas/accountability-1.0.0.json",
+  "title": "certLedger public-law accountability dataset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "dataset", "matters", "entities", "sources", "assertions"],
+  "properties": {
+    "schemaVersion": { "const": "certledger-accountability/1.0.0" },
+    "dataset": { "$ref": "#/$defs/dataset" },
+    "matters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/matter" }
+    },
+    "entities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    },
+    "assertions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/assertion" }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "title", "createdAt", "description", "rules"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "title": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "description": { "type": "string", "minLength": 1 },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "matter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "subjectIds", "title", "shortTitle", "forum", "jurisdiction", "docket", "openedDate", "decisionDate", "disposition", "semanticPhrase"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "subjectIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "shortTitle": { "type": "string", "minLength": 1 },
+        "forum": { "type": "string", "minLength": 1 },
+        "jurisdiction": { "type": "string", "minLength": 1 },
+        "docket": { "type": "string", "minLength": 1 },
+        "openedDate": { "$ref": "#/$defs/date" },
+        "decisionDate": { "$ref": "#/$defs/date" },
+        "disposition": { "type": "string", "minLength": 1 },
+        "semanticPhrase": { "type": "string", "minLength": 1 }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "name", "classes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["person", "group", "organization"] },
+        "name": { "type": "string", "minLength": 1 },
+        "classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "capture": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["retrievedAt", "sha256", "byteLength", "hashScope", "ipfsCid", "chainTxid"],
+      "properties": {
+        "retrievedAt": { "type": "string", "format": "date-time" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "byteLength": { "type": "integer", "minimum": 1 },
+        "hashScope": { "type": "string", "minLength": 1 },
+        "ipfsCid": { "type": ["string", "null"] },
+        "chainTxid": { "type": ["string", "null"] }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "publisher", "sourceClass", "evidenceUse", "documentDate", "uri", "capture"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "publisher": { "type": "string", "minLength": 1 },
+        "sourceClass": { "enum": ["primary-official", "commentary"] },
+        "evidenceUse": { "enum": ["eligible", "context-only"] },
+        "documentDate": {
+          "oneOf": [
+            { "$ref": "#/$defs/date" },
+            { "type": "null" }
+          ]
+        },
+        "uri": { "type": "string", "format": "uri" },
+        "capture": { "$ref": "#/$defs/capture" }
+      }
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "locator"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/id" },
+        "locator": { "type": "string", "minLength": 1 }
+      }
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "subjectIds", "matterId", "actorId", "predicate", "predicateLabel", "actorSide", "factClass", "eventDate", "statement", "sourceRefs"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "subjectIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "matterId": { "$ref": "#/$defs/id" },
+        "actorId": { "$ref": "#/$defs/id" },
+        "predicate": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$" },
+        "predicateLabel": { "type": "string", "minLength": 1 },
+        "actorSide": { "enum": ["subject", "opposing", "tribunal", "appointment-history"] },
+        "factClass": { "enum": ["allegation", "procedural-fact", "adjudicated-outcome", "correction", "exoneration"] },
+        "eventDate": { "$ref": "#/$defs/date" },
+        "statement": { "type": "string", "minLength": 1 },
+        "sourceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceRef" }
+        }
+      }
+    }
+  }
+}
